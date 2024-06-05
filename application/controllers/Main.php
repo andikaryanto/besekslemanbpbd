@@ -23,6 +23,7 @@ class Main extends CI_Controller {
 		$data["data"] = $this->_lap->data_kejadian_live('1', $from, $to)->result();
 		$data['range'] = $range;
 		$data['jarak'] = $this->db->get("tbljarak")->result()[0];
+		$data['peringatandini'] = $this->db->order_by('idperingatan', 'DESC')->get("tblperingatandini")->result()[0];
 		$this->load->view('v_main', $data);
 	}
 

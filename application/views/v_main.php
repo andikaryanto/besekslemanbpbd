@@ -124,30 +124,36 @@
 
               <div class="col s12 m4 l4">
                 <div class="card-panel" style="padding-top:1px;">
-                  <h4 class="header2" style="text-align:center">Status Gunung Merapi
-                    <?php
-                    $color = '';
-                    if (strtolower($jarak->statusaktivitas) == 'normal') {
-                      $color = 'green';
-                    } else if (strtolower($jarak->statusaktivitas) == 'waspada') {
-                      $color = 'yellow';
-                    } else if (strtolower($jarak->statusaktivitas) == 'siaga') {
-                      $color = 'orange';
-                    } else if (strtolower($jarak->statusaktivitas) == 'awas') {
-                      $color = 'red';
-                    }
-                    ?>
-                    <div class='<?= $color ?> ' style="padding: 5px 2px; margin:5px 0px;">
-                      <?= $jarak->statusaktivitas ?>
+                  <h4 class="header2" style="text-align:center">Status Gunung Merapi</h4>
+                  <?php
+                  $color = '';
+                  if (strtolower($jarak->statusaktivitas) == 'normal') {
+                    $color = 'green';
+                  } else if (strtolower($jarak->statusaktivitas) == 'waspada') {
+                    $color = 'yellow';
+                  } else if (strtolower($jarak->statusaktivitas) == 'siaga') {
+                    $color = 'orange';
+                  } else if (strtolower($jarak->statusaktivitas) == 'awas') {
+                    $color = 'red';
+                  }
+                  ?>
+                  <div class='<?= $color ?> ' style="padding: 5px 2px; margin:5px 0px;">
+                    <h4 class="header2" style="text-align:center"><?= $jarak->statusaktivitas ?></h4>
+                  </div>
+                  <div>
+                    <div class='header1' style="padding: 5px 2px; margin:5px 0px;">
+                      Rekomendasi:
                     </div>
-                    <div>
-                      <div class='header1' style="padding: 5px 2px; margin:5px 0px;">
-                        Rekomendasi:
-                      </div>
-                      <p cas style="padding: 5px 2px; margin:5px 0px;">
-                        <?= $jarak->Rekomendasi ?>
-                      </p>
-                    </div>
+                    <p cas style="padding: 5px 2px; margin:5px 0px;">
+                      <?= $jarak->Rekomendasi ?>
+                    </p>
+                  </div>
+                </div>
+                <div class="card-panel" style="padding-top:1px;">
+                  <h4 class="header2" style="text-align:center">Informasi dan peringatan dini</h4>
+                  <div style="padding: 5px 2px; margin:5px 0px;">
+                    <?= $peringatandini->keterangan ?>
+                  </div>
                 </div>
               </div>
             </div>
