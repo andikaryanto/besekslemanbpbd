@@ -123,6 +123,7 @@
               </div>
 
               <div class="col s12 m4 l4">
+                
                 <div class="card-panel" style="padding-top:1px;">
                   <h4 class="header2" style="text-align:center">Status Gunung Merapi</h4>
                   <?php
@@ -244,6 +245,8 @@
       }
     });
 
+    
+
     $('.datepicker').pickadate({
       selectMonths: true, // Creates a dropdown to control month
       selectYears: 100,
@@ -254,6 +257,10 @@
       format: 'dd-mm-yyyy',
       closeOnSelect: true // Close upon selecting a date,
     });
+
+    $('.datepicker').on('mousedown', function preventClosing(event) {
+  event.preventDefault();
+});
 
     $("#map").click(function(e) {
       var lat = $("#lat").val();
