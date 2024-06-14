@@ -796,16 +796,36 @@ class lp_export extends MY_Controller {
       $judul = 'Laporan Kartu Stok';
       $this->load->library('Pdf');
       $pdf = new Pdf('L', 'mm', 'A4', true, 'UTF-8', false);
-      $pdf->SetHeaderData('logo.png', '35px', '', '', array(0,64,255), array(0,64,128));
-      $pdf->SetFont('courier','B','14');
-      $pdf->SetTitle($judul);
-      $pdf->SetHeaderMargin(6);
-      $pdf->SetTopMargin(0);
-      $pdf->SetPrintHeader(true);
-      $pdf->setFooterMargin(12);
-
-      $pdf->SetAutoPageBreak(true);
+      $pdf->judul = $judul;
+     
+      // set document information
+      $pdf->SetCreator(PDF_CREATOR);
       $pdf->SetAuthor('Propan');
+      $pdf->SetTitle($judul);
+      $pdf->SetSubject('Laporan Stok');
+      $pdf->SetKeywords('BPBD, PDF, Sleman, Laporan');
+
+      // set default header data
+      $pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING);
+
+      // set header and footer fonts
+      $pdf->setHeaderFont(Array(PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN));
+      $pdf->setFooterFont(Array(PDF_FONT_NAME_DATA, '', PDF_FONT_SIZE_DATA));
+
+      // set default monospaced font
+      $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+
+      // set margins
+      $pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
+      $pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
+      $pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+
+      // set auto page breaks
+      $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+
+      // set image scale factor
+      $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+
       $pdf->SetDisplayMode('real', 'default');
       $pdf->AddPage('L', 'A4');
       $fill=false;
@@ -898,16 +918,36 @@ class lp_export extends MY_Controller {
       $judul = 'Laporan Summary Stok';
       $this->load->library('Pdf');
       $pdf = new Pdf('L', 'mm', 'A4', true, 'UTF-8', false);
-      $pdf->SetHeaderData('logo.png', '35px', '', '', array(0,64,255), array(0,64,128));
-      $pdf->SetFont('courier','B','14');
-      $pdf->SetTitle($judul);
-      $pdf->SetHeaderMargin(6);
-      $pdf->SetTopMargin(0);
-      $pdf->SetPrintHeader(true);
-      $pdf->setFooterMargin(12);
-
-      $pdf->SetAutoPageBreak(true);
+      $pdf->judul = $judul;
+     
+      // set document information
+      $pdf->SetCreator(PDF_CREATOR);
       $pdf->SetAuthor('Propan');
+      $pdf->SetTitle($judul);
+      $pdf->SetSubject('Laporan Stok');
+      $pdf->SetKeywords('BPBD, PDF, Sleman, Laporan');
+
+      // set default header data
+      $pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING);
+
+      // set header and footer fonts
+      $pdf->setHeaderFont(Array(PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN));
+      $pdf->setFooterFont(Array(PDF_FONT_NAME_DATA, '', PDF_FONT_SIZE_DATA));
+
+      // set default monospaced font
+      $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+
+      // set margins
+      $pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
+      $pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
+      $pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+
+      // set auto page breaks
+      $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+
+      // set image scale factor
+      $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+
       $pdf->SetDisplayMode('real', 'default');
       $pdf->AddPage('L', 'A4');
       $fill=false;
@@ -915,8 +955,8 @@ class lp_export extends MY_Controller {
       $col = array('25','65','15','20','35','30','40','47');//Lebarnya total 280, tinggal sesuaikan saja panjang 190
 
       $pdf->Ln(2);
-      $pdf->Cell(280,13, $judul, 0, 1, 'C', 0, '', 0);
-      $pdf->SetFont('courier','R','11');
+      // $pdf->Cell(280,13, '', 0, 1, 'C', 0, '', 0);
+      // $pdf->SetFont('courier','R','11');
       // $pdf->Cell(280,5, 'Periode : '.$start.' - '.$end, 0, 1, 'C', 0, '', 0);
       $pdf->SetFont('courier','B','9');
       $pdf->SetFillColor(236,235,230); //main RGB aja
