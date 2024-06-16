@@ -33,7 +33,8 @@ class lp_export extends MY_Controller {
           case 'bencana':
             switch ($status_laporan) {
               case 'rekap':
-                $this->laporan_summary($bencana, $status, $dari, $hingga, $kecamatan, $kelurahan);
+                $fileExport = $this->input->post("fileExport");
+                $this->laporan_summary($bencana, $status, $dari, $hingga, $kecamatan, $kelurahan, $fileExport);
                 break;
               case 'detail':
                 $this->laporan_detail($bencana, $status, $dari, $hingga, $kecamatan, $kelurahan);
@@ -345,225 +346,240 @@ class lp_export extends MY_Controller {
       }
   }
 
-  function laporan_summary($bencana = '', $status = '', $dari = '', $hingga = '', $kecamatan = '', $kelurahan = ''){
+  function laporan_summary($bencana = '', $status = '', $dari = '', $hingga = '', $kecamatan = '', $kelurahan = '', $fileExport = ''){
   $data = $this->_lap->sub_header_bencana($bencana, $status, $dari, $hingga, $kecamatan, $kelurahan);
   if($data->result() != array()){
 
-      $this->load->library('PHPExcel');
-  		$phpExcel = new PHPExcel();
-  		$prestasi = $phpExcel->setActiveSheetIndex(0);
-  		$phpExcel->getActiveSheet()->getStyle('A6:CZ6')->getFont()->setBold(true);
-
-  		$phpExcel->getActiveSheet()->mergeCells('B6:C6');
-      $letter = 'B';
-      while ($letter !== 'CZ') {
-  			$phpExcel->getActiveSheet()->getColumnDimension($letter)->setAutoSize(true);
-        $letter++;
-  		}
-  		$phpExcel->getActiveSheet()->getColumnDimension('A')->setWidth(10);
-      $style_bold = array('font' => array('bold' => true,
-                                     )
-                     );
-      $warna = array(
-                  'fill' => array(
-                    'type' => PHPExcel_Style_Fill::FILL_SOLID,
-                    'startcolor' => array(
-                      'rgb' => 'ADD8E6',
-                      ),
-                    ),
-                    'font' => array('bold' => true)
-                  );
-
-      if ($kecamatan != '') {
-        $nama_kecamatan = $this->db->get_where("tblkecamatan", array("id_kec" => $kecamatan))->row("nama");
-      }else{
-        $nama_kecamatan = 'Semua';
-      }
-
-      if ($kelurahan != '') {
-        $nama_kelurahan = $this->db->get_where("tblkelurahan", array("id_kel" => $kelurahan))->row("nama");
-      }else{
-        $nama_kelurahan = 'Semua';
-      }
-
-  	$nama_bencana = $this->db->get_where("tblbencana", array("id" => $bencana))->row("nama");
-    if ($nama_bencana == '') {
-        $nama_bencana = 'Semua Bencana';
-    }
-  	$prestasi->setCellValue('A1', "Rekap Dampak $nama_bencana");
-  	$prestasi->setCellValue('A2', "Periode : $dari - $hingga");
-  	$prestasi->setCellValue('A4', "Status : $status");
-  	$prestasi->setCellValue('A3', "Kecamatan : $nama_kecamatan");
-  	$prestasi->setCellValue('D3', "Kelurahan : $nama_kelurahan");
-
-  	$prestasi->setCellValue('A6', "No");
-  	$prestasi->setCellValue('B6', "Kecamatan");
-  	$prestasi->setCellValue('D6', "Total Kejadian");
-  	// $prestasi->setCellValue('C6', 'Kelurahan');
-
-      $data_bencana = $this->db->get_where("tbldampak", array("flag" => '0'));
-      $count = $data_bencana->num_rows();
-      $array_bencana = $data_bencana->result_array();
-      $x = 0;
-      $letter = 'D';
-      while ($letter !== 'CZ') {
-        $letter++;
-        $isi = $letter.'6';
-    		$prestasi->setCellValue($isi, $array_bencana[$x]['nama']);
-
-        $x++;
-        if($x == $count){
+      switch ($fileExport) {
+        case 'pdf':
+          //TODO: Export PDF here
+          $this->session->set_flashdata('error', "PDF not ready yet");
+          redirect(base_url("lp_export"));
           break;
-        }
-      }
-
-  	   $no = 1; $id_kec = '';
-      $no2 = 1; $id_kel = '';
-  	   $rowexcel = 7; $jml_kec = 0;
-      $id_jml = ''; $flag_sum = '';
-      $sum_total = '';
-      // die(print_r($data->result()));
-      $total_kejadian_per_kecamatan = 0;
-      $nama_kecamatan_sebelumnya = "";
-      foreach ($data->result() as $row){
-        // piye logic e wkwkwk, sik  delo
-        // 
-  		  if ($id_kec != $row->id_kec) {
-  			$range_merge_kel = "B".$rowexcel.':'.$letter.$rowexcel;
-  			$phpExcel->getActiveSheet()->mergeCells($range_merge_kel);
-  			$prestasi->setCellValue('A'.$rowexcel, $no2);
-  			$prestasi->setCellValue('B'.$rowexcel, $row->nama_kecamatan);
-  			$rowexcel++;
-  			$no2++; $no = 1;
-  			// echo $id_kel.'___'.$row->id_kel.'<br />';
-  		  }
-  		  // echo $id_kel.'_aas__'.$row->id_kel.'<br />';
-    		if ($id_kel != $row->id_kel) {
-    			if ($flag_sum == '') { //ambil flag sum dari row total kejadian per kelurahan paling atas
-    			  $flag_sum = $rowexcel;
-    			}
-    			$prestasi->setCellValue('B'.$rowexcel, $no);
-    			$prestasi->setCellValue('C'.$rowexcel, $row->nama_kelurahan);
-    			$prestasi->setCellValue('D'.$rowexcel, $row->total);
-          $total_kejadian_per_kecamatan += $row->total;
-
-    			$letter = 'D';
-    			$x = 0;
-    			while ($letter !== 'CZ') {
-    			  $letter++;
-    			  $col = $letter.$rowexcel;
-    			  $jml = $this->_lap->num_detail($row->id_kel, $array_bencana[$x]['idtbldampak'])->row("jml");
-    			  if ($jml == '') {
-    				$jml = 0;
-    			  }
-    				$prestasi->setCellValue($col, $jml);
-
-    			  $x++;
-    			  if($x == $count){
-    				break;
-    			  }
-    			}
-    			// echo $flag_sum.'<br />'; // untuk sum setiap kejadian
-    			$rowexcel++;
-          $row_jumlah_kolom = $rowexcel + $no; 
-          //-][00000000\77770]
-          // row jumlah e rodo angel sek
-          // logic e yo, $row_jumlah_kolom = $rowexcel + jumlah keluarahan ndek data
-          //-][00000000\77770];  
-    			$no++;
-    			$jml_kec++;
-    			// echo $jml_kec.'__'.$row->jml_kec.'<br />';
-      			// if ($jml_kec == $row->jml_kec || $kelurahan != '') { //sub total per kecamatan
-            if($nama_kecamatan_sebelumnya != $row->nama_kecamatan) {
-              $nama_kecamatan_sebelumnya = $row->nama_kecamatan;
-              $cell_subtotal = "B".$row_jumlah_kolom .':C'. $row_jumlah_kolom;
-      			  $phpExcel->getActiveSheet()->mergeCells($cell_subtotal);
-      			  $prestasi->setCellValue('B'.$row_jumlah_kolom, "JUMLAH");
-
-      			  $letter = 'D'; $x = 0;
-      			  while ($letter !== 'CZ') {
-        				$isi = $letter.$rowexcel;
-        				$begin = $letter.$flag_sum;
-        				$last = $rowexcel - 1;
-        				$isi2 = '=SUM('.$begin.':'.$letter.$last.")";
-        				$locale = 'es';
-        				$validLocale = PHPExcel_Settings::setLocale($locale);
-        				if (!$validLocale) {
-        				  echo 'Unable to set locale to '.$locale." - reverting to en_us<br />\n";
-        				}
-        				$internalFormula =
-        				  PHPExcel_Calculation::getInstance()->_translateFormulaToEnglish($isi2);
-
-        				$prestasi->setCellValue($isi,$internalFormula);
-        				$phpExcel->getActiveSheet()->getStyle($begin.':'.$isi)->getNumberFormat()->setFormatCode('#,##0');
-
-        				if($x == $count){
-        				  break;
-        				}
-      				$x++; $letter++;
-      			  }
-      			  $set_bold = "A".$rowexcel.':'.$letter.$rowexcel;
-
-      			  $sum_total = $sum_total."$#$".$rowexcel.'; ';
-      			  $jml_kec = 0;
-      				$rowexcel++;
-      			  $flag_sum = '';
-      			}
-  		  }
-
-  		  $id_kel = $row->id_kel;
-  		  $id_kec = $row->id_kec;
-
-  		} //end loop
-
-  		//die("asd");
-  		$phpExcel->getActiveSheet()->mergeCells("A$rowexcel:C$rowexcel");
-      $prestasi->setCellValue("A$rowexcel","TOTAL");
-      $phpExcel->getActiveSheet()
-      ->getStyle("A$rowexcel")
-      ->getAlignment()
-      ->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-
-      $letter = 'D'; $x = 0;
-      while ($letter !== 'CZ') {
-        $isi = $letter.$rowexcel;
-        $row_total = str_replace("#", $letter, $sum_total);
-        $row_total = substr($row_total, 0,-2);
-
-        $isi2 = "=SUM(".$row_total." )";
-        $locale = 'es';
-        $validLocale = PHPExcel_Settings::setLocale($locale);
-        if (!$validLocale) {
-            echo 'Unable to set locale to '.$locale." - reverting to en_us<br />\n";
-        }
-        $internalFormula =
-            PHPExcel_Calculation::getInstance()->_translateFormulaToEnglish($isi2);
-        // echo $isi2.'___'.$internalFormula.'<br />';
-        $prestasi->setCellValue($isi,$internalFormula);
-        if($x == $count){
+        
+        default:
+          $this->exportExcelLaporanSummary($data, $bencana, $status, $dari, $hingga, $kecamatan, $kelurahan);
           break;
-        }
-        $x++; $letter++;
       }
-      $begin = "A".$rowexcel;
-      $phpExcel->getActiveSheet()->getStyle($begin.':'.$isi)->getNumberFormat()->setFormatCode('#,##0');
-      $phpExcel->getActiveSheet()->getStyle($begin.':'.$isi)->applyFromArray($warna);
 
-      // die();
-
-      $prestasi->setTitle("Laporan Rekap $nama_bencana");
-       ob_end_clean();
-  		header("Content-Type: application/vnd.ms-excel");
-  		header("Content-Disposition: attachment; filename=\"Laporan Rekap Dampak $nama_bencana $dari - $hingga.xls\"");
-  		header("Cache-Control: max-age=0");
-  		$objWriter = PHPExcel_IOFactory::createWriter($phpExcel, "Excel5");
-  		$objWriter->save("php://output");
     }else{
       // die(print_r($data));
       $this->session->set_flashdata('error', "Data Tidak Ada");
       redirect(base_url("lp_export"));
     }
     // exit;
+  }
+
+  function exportExcelLaporanSummary($data, $bencana = '', $status = '', $dari = '', $hingga = '', $kecamatan = '', $kelurahan = ''){
+    $this->load->library('PHPExcel');
+    $phpExcel = new PHPExcel();
+    $prestasi = $phpExcel->setActiveSheetIndex(0);
+    $phpExcel->getActiveSheet()->getStyle('A6:CZ6')->getFont()->setBold(true);
+
+    $phpExcel->getActiveSheet()->mergeCells('B6:C6');
+    $letter = 'B';
+    while ($letter !== 'CZ') {
+      $phpExcel->getActiveSheet()->getColumnDimension($letter)->setAutoSize(true);
+      $letter++;
+    }
+    $phpExcel->getActiveSheet()->getColumnDimension('A')->setWidth(10);
+    $style_bold = array('font' => array('bold' => true,
+                                   )
+                   );
+    $warna = array(
+                'fill' => array(
+                  'type' => PHPExcel_Style_Fill::FILL_SOLID,
+                  'startcolor' => array(
+                    'rgb' => 'ADD8E6',
+                    ),
+                  ),
+                  'font' => array('bold' => true)
+                );
+
+    if ($kecamatan != '') {
+      $nama_kecamatan = $this->db->get_where("tblkecamatan", array("id_kec" => $kecamatan))->row("nama");
+    }else{
+      $nama_kecamatan = 'Semua';
+    }
+
+    if ($kelurahan != '') {
+      $nama_kelurahan = $this->db->get_where("tblkelurahan", array("id_kel" => $kelurahan))->row("nama");
+    }else{
+      $nama_kelurahan = 'Semua';
+    }
+
+  $nama_bencana = $this->db->get_where("tblbencana", array("id" => $bencana))->row("nama");
+  if ($nama_bencana == '') {
+      $nama_bencana = 'Semua Bencana';
+  }
+  $prestasi->setCellValue('A1', "Rekap Dampak $nama_bencana");
+  $prestasi->setCellValue('A2', "Periode : $dari - $hingga");
+  $prestasi->setCellValue('A4', "Status : $status");
+  $prestasi->setCellValue('A3', "Kecamatan : $nama_kecamatan");
+  $prestasi->setCellValue('D3', "Kelurahan : $nama_kelurahan");
+
+  $prestasi->setCellValue('A6', "No");
+  $prestasi->setCellValue('B6', "Kecamatan");
+  $prestasi->setCellValue('D6', "Total Kejadian");
+  // $prestasi->setCellValue('C6', 'Kelurahan');
+
+    $data_bencana = $this->db->get_where("tbldampak", array("flag" => '0'));
+    $count = $data_bencana->num_rows();
+    $array_bencana = $data_bencana->result_array();
+    $x = 0;
+    $letter = 'D';
+    while ($letter !== 'CZ') {
+      $letter++;
+      $isi = $letter.'6';
+      $prestasi->setCellValue($isi, $array_bencana[$x]['nama']);
+
+      $x++;
+      if($x == $count){
+        break;
+      }
+    }
+
+     $no = 1; $id_kec = '';
+    $no2 = 1; $id_kel = '';
+     $rowexcel = 7; $jml_kec = 0;
+    $id_jml = ''; $flag_sum = '';
+    $sum_total = '';
+    // die(print_r($data->result()));
+    $total_kejadian_per_kecamatan = 0;
+    $nama_kecamatan_sebelumnya = "";
+    foreach ($data->result() as $row){
+      // piye logic e wkwkwk, sik  delo
+      // 
+      if ($id_kec != $row->id_kec) {
+      $range_merge_kel = "B".$rowexcel.':'.$letter.$rowexcel;
+      $phpExcel->getActiveSheet()->mergeCells($range_merge_kel);
+      $prestasi->setCellValue('A'.$rowexcel, $no2);
+      $prestasi->setCellValue('B'.$rowexcel, $row->nama_kecamatan);
+      $rowexcel++;
+      $no2++; $no = 1;
+      // echo $id_kel.'___'.$row->id_kel.'<br />';
+      }
+      // echo $id_kel.'_aas__'.$row->id_kel.'<br />';
+      if ($id_kel != $row->id_kel) {
+        if ($flag_sum == '') { //ambil flag sum dari row total kejadian per kelurahan paling atas
+          $flag_sum = $rowexcel;
+        }
+        $prestasi->setCellValue('B'.$rowexcel, $no);
+        $prestasi->setCellValue('C'.$rowexcel, $row->nama_kelurahan);
+        $prestasi->setCellValue('D'.$rowexcel, $row->total);
+        $total_kejadian_per_kecamatan += $row->total;
+
+        $letter = 'D';
+        $x = 0;
+        while ($letter !== 'CZ') {
+          $letter++;
+          $col = $letter.$rowexcel;
+          $jml = $this->_lap->num_detail($row->id_kel, $array_bencana[$x]['idtbldampak'])->row("jml");
+          if ($jml == '') {
+          $jml = 0;
+          }
+          $prestasi->setCellValue($col, $jml);
+
+          $x++;
+          if($x == $count){
+          break;
+          }
+        }
+        // echo $flag_sum.'<br />'; // untuk sum setiap kejadian
+        $rowexcel++;
+        $row_jumlah_kolom = $rowexcel + $no; 
+        //-][00000000\77770]
+        // row jumlah e rodo angel sek
+        // logic e yo, $row_jumlah_kolom = $rowexcel + jumlah keluarahan ndek data
+        //-][00000000\77770];  
+        $no++;
+        $jml_kec++;
+        // echo $jml_kec.'__'.$row->jml_kec.'<br />';
+          // if ($jml_kec == $row->jml_kec || $kelurahan != '') { //sub total per kecamatan
+          if($nama_kecamatan_sebelumnya != $row->nama_kecamatan) {
+            $nama_kecamatan_sebelumnya = $row->nama_kecamatan;
+            $cell_subtotal = "B".$row_jumlah_kolom .':C'. $row_jumlah_kolom;
+            $phpExcel->getActiveSheet()->mergeCells($cell_subtotal);
+            $prestasi->setCellValue('B'.$row_jumlah_kolom, "JUMLAH");
+
+            $letter = 'D'; $x = 0;
+            while ($letter !== 'CZ') {
+              $isi = $letter.$rowexcel;
+              $begin = $letter.$flag_sum;
+              $last = $rowexcel - 1;
+              $isi2 = '=SUM('.$begin.':'.$letter.$last.")";
+              $locale = 'es';
+              $validLocale = PHPExcel_Settings::setLocale($locale);
+              if (!$validLocale) {
+                echo 'Unable to set locale to '.$locale." - reverting to en_us<br />\n";
+              }
+              $internalFormula =
+                PHPExcel_Calculation::getInstance()->_translateFormulaToEnglish($isi2);
+
+              $prestasi->setCellValue($isi,$internalFormula);
+              $phpExcel->getActiveSheet()->getStyle($begin.':'.$isi)->getNumberFormat()->setFormatCode('#,##0');
+
+              if($x == $count){
+                break;
+              }
+            $x++; $letter++;
+            }
+            $set_bold = "A".$rowexcel.':'.$letter.$rowexcel;
+
+            $sum_total = $sum_total."$#$".$rowexcel.'; ';
+            $jml_kec = 0;
+            $rowexcel++;
+            $flag_sum = '';
+          }
+      }
+
+      $id_kel = $row->id_kel;
+      $id_kec = $row->id_kec;
+
+    } //end loop
+
+    //die("asd");
+    $phpExcel->getActiveSheet()->mergeCells("A$rowexcel:C$rowexcel");
+    $prestasi->setCellValue("A$rowexcel","TOTAL");
+    $phpExcel->getActiveSheet()
+    ->getStyle("A$rowexcel")
+    ->getAlignment()
+    ->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+
+    $letter = 'D'; $x = 0;
+    while ($letter !== 'CZ') {
+      $isi = $letter.$rowexcel;
+      $row_total = str_replace("#", $letter, $sum_total);
+      $row_total = substr($row_total, 0,-2);
+
+      $isi2 = "=SUM(".$row_total." )";
+      $locale = 'es';
+      $validLocale = PHPExcel_Settings::setLocale($locale);
+      if (!$validLocale) {
+          echo 'Unable to set locale to '.$locale." - reverting to en_us<br />\n";
+      }
+      $internalFormula =
+          PHPExcel_Calculation::getInstance()->_translateFormulaToEnglish($isi2);
+      // echo $isi2.'___'.$internalFormula.'<br />';
+      $prestasi->setCellValue($isi,$internalFormula);
+      if($x == $count){
+        break;
+      }
+      $x++; $letter++;
+    }
+    $begin = "A".$rowexcel;
+    $phpExcel->getActiveSheet()->getStyle($begin.':'.$isi)->getNumberFormat()->setFormatCode('#,##0');
+    $phpExcel->getActiveSheet()->getStyle($begin.':'.$isi)->applyFromArray($warna);
+
+    // die();
+
+    $prestasi->setTitle("Laporan Rekap $nama_bencana");
+     ob_end_clean();
+    header("Content-Type: application/vnd.ms-excel");
+    header("Content-Disposition: attachment; filename=\"Laporan Rekap Dampak $nama_bencana $dari - $hingga.xls\"");
+    header("Cache-Control: max-age=0");
+    $objWriter = PHPExcel_IOFactory::createWriter($phpExcel, "Excel5");
+    $objWriter->save("php://output");
   }
 
 	function laporan_detail($bencana, $status, $dari, $hingga, $kecamatan, $kelurahan){
