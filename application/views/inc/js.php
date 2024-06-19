@@ -1,5 +1,6 @@
 <!-- jQuery Library -->
 <script type="text/javascript" src="<?php echo base_url()?>assets/js/plugins/jquery-1.11.2.min.js"></script>
+
 <!-- <script type="text/javascript" src="<?php echo base_url()?>assets/js/jquery.js"></script> -->
 <!--materialize js-->
 <script type="text/javascript" src="<?php echo base_url()?>assets/js/materialize.min.js"></script>
