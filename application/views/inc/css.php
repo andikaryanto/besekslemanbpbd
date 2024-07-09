@@ -28,6 +28,7 @@
 <!-- fileinput -->
 <link rel="stylesheet" href="<?php echo base_url();?>assets/css/fileinput.min.css" type="text/css"/>
 
+
 <style>
   .btn-small{
     height: 25px;

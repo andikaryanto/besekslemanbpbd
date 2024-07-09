@@ -12,10 +12,15 @@
     <?php include('inc/css.php') ?>
     <link rel="stylesheet" href="<?php echo base_url();?>assets/css/fileinput.min.css" type="text/css"/>
     <link rel="stylesheet" href="<?php echo base_url();?>assets/select2/select2.min.css" type="text/css"/>
+    <link rel="stylesheet" href="<?php echo base_url();?>assets/css/jquery-te-1.4.0.css" type="text/css"/>
+    <link rel="stylesheet" href="https://unpkg.com/lite-editor@1.6.39/css/lite-editor.css">
     <style>
 
     td{padding: 2px 5px;}
     .warna_error {color:red;}
+
+    
+
     </style>
 </head>
 
@@ -52,18 +57,21 @@
                               <div class="input-field col s12 m4">
                                 <input id="first_name" name='nir' type="text">
                                 <label for="first_name">No NIR</label>
+                                <!-- <div>
+                                  <textarea id="first_name" name='nir' class="js-editor"></textarea>
+                                </div> -->
                               </div>
-                              <div class="input-field col s12 m5">
+                              <div class="input-field col s12 m4">
                                 <input id="email5" type="text" name="nama" required data-error=".errorTxt1">
                                 <div class="warna_error errorTxt1"></div>
                                 <label for="email">Nama Pelapor</label>
                               </div>
-                              <div class="input-field col s6 m3">
+                              <div class="input-field col s6 m4">
                                 <input id="notelp" name="notelp" type="text">
                                 <label for="notelp">No Telephone/ HP </label>
                               </div>
-                              <div class="input-field col s6">
-                                <select name="kelurahan" id="kelurahan" required class="select" data-error=".kelurahan">
+                              <div class="input-field col s6 m4">
+                                <select style="width: 100%;" name="kelurahan" id="kelurahan" required class="select" data-error=".kelurahan">
                                   <option value="" disabled selected>Pilih Desa / Kelurahan</option>
                                   <?php foreach($kelurahan as $row){ ?>
                                   <option value="<?php echo $row->id_kel?>"><?php echo $row->nama ?></option>
@@ -72,17 +80,15 @@
                                 <div class="warna_error kelurahan"></div>
                                 <!-- <label>Desa / Kelurahan</label> -->
                               </div>
-                              <div class="input-field col m5 s12" style="padding-left:55px;">
-                                <select name="dusun" id="dusun" class="select" required title="Harap Di Pilih" data-error=".errorTxt4">
+                              <div class="input-field col m4 s6">
+                                <select style="width: 100%;" name="dusun" id="dusun" class="select" required title="Harap Di Pilih" data-error=".errorTxt4">
                                   <option value="" disabled selected> -- Pilih Desa / Kelurahan Terlebih Dahulu -- </option>
                                 </select>
                                 <div class="errorTxt4"></div>
                                 <!-- <label for="password">Kelurahan</label> -->
                               </div>
-                            </div>
-                            <div class="row">
-                              <div class="input-field col s6">
-                                <select name="bencana" class="select" required>
+                              <div class="input-field col s6 m4">
+                                <select style="width: 100%;" name="bencana" class="select" required>
                                   <option value="" disabled selected>Pilih Jenis Bencana</option>
                                   <?php foreach($bencana as $row){ ?>
                                   <option value="<?php echo $row->id?>"><?php echo $row->nama ?></option>
@@ -90,26 +96,24 @@
                                 </select>
                                 <!-- <label for="email">Bencana</label> -->
                               </div>
-                              <!-- <div class="row">
-
-                              </div> -->
-                              <div class="input-field col s3">
+                 
+                              <div class="input-field col s3 m4">
                                 <input id="password6" type="text" name="rt" required data-error=".errorTxt4">
                                 <div class="warna_error errorTxt4"></div>
                                 <label for="password">RT</label>
                               </div>
 
-                                <div class="input-field col s3">
+                                <div class="input-field col s3 m4">
                                   <input id="email5" type="text" name="rw" required data-error=".errorTxt5">
                                   <div class="warna_error errorTxt5"></div>
                                   <label for="email">RW</label>
                                 </div>
                             </div>
 
-                            <div class="row">
-                                <div class="input-field col m6 s12">
+                            <div class="row" style="margin-top: 20px;">
+                                <div class="input-field col m4 s12">
                                   <?php $status = array("belum_di_tangani", "proses", "hold", "selesai");?>
-                                  <select name="status" required class="select"  data-error=".errorTxt12">
+                                  <select style="width: 100%;" name="status" required class="select"  data-error=".errorTxt12">
                                     <option value="" disabled selected> -- Status Laporan --</option>
                                     <?php foreach($status as $row){ ?>
                                     <option value="<?php echo $row?>"><?php echo str_replace("_", " ", $row)?></option>
@@ -117,14 +121,17 @@
                                   </select>
                                   <div class="warna_error errorTxt12"></div>
                                 </div>
-                                <div class="input-field col m3 s6">
+                                <div class="col m4 s6">
                                   <!-- <i class="mdi-action-account-circle prefix"></i> -->
-                                  <input name="dampak" type="text" required data-error=".errorTxt26">
+                                  <!-- <input name="dampak" type="text" required data-error=".errorTxt26"> -->
                                   <label for="first_name">Rangkuman Dampak</label>
+                                   <div>
+                                    <textarea style="width: 100%;" id="first_name" name="dampak" class="js-editor"></textarea>
+                                   </div>
                                   <div class="warna_error errorTxt26"></div>
                                 </div>
-                                <div class="input-field col s6 m3">
-                                  <input type="text" id="datetime" name="tgl_kejadian" required data-error=".errorTxt11"/>
+                                <div class="input-field col s6 m4">
+                                  <input  style="width: 100%;" type="text" id="datetime" name="tgl_kejadian" required data-error=".errorTxt11"/>
                                   <div class="warna_error errorTxt11"></div>
                                   <label for="first_name">Tanggal Kejadian</label>
 
@@ -163,7 +170,7 @@
                               <div class="input-field col s2 m1 l1">
                                 <label for="password" id="lbl_lat" class=""><b>Foto</b></label>
                               </div>
-                              <div class="input-field col s10 m5 l5">
+                              <div class="input-field col s10 m2 l5">
                                 <input id="file-0" class="" type="file" accept="picture/*" data-show-upload="false" data-show-remove="false" multiple name="foto[]">
                               </div>
                               <div class="input-field col s2 m1 l1">
@@ -329,12 +336,18 @@
     ================================================ -->
 
     <?php include("inc/js.php") ?>
+    <script src="https://unpkg.com/lite-editor@1.6.39/js/lite-editor.min.js"></script>
+    <script type="text/javascript" src="<?php echo base_url()?>assets/js/jquery-te-1.4.0.min.js"></script>
     <script src="<?php echo base_url();?>assets/js/fileinput.min.js" type="text/javascript" charset="utf-8"></script>
     <script src="<?php echo base_url();?>assets/select2/select2.full.min.js" type="text/javascript" charset="utf-8"></script>
     <script src="https://maps.googleapis.com/maps/api/js?&libraries=places&key=AIzaSyBFA8EZF7jraTiiwDRyfRTiMnxD67-g0cE"></script>
     <script src="<?php echo base_url();?>assets/js/picker.time.js"></script>
 
     <script>
+
+        new LiteEditor('.js-editor');
+
+
     var datepicker = $('#date').pickadate({
         container: '#outlet',
         selectMonths: true, // Creates a dropdown to control month
@@ -521,6 +534,8 @@
         }
         document.getElementById("latitude_e").value = langitude;
         document.getElementById("longitude_e").value = longitude;
+
+     
 
           var myLatlng = new google.maps.LatLng(langitude, longitude);
 
